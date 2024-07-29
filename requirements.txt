@@ -1,0 +1,11 @@
+grpcio-tools
+pydub
+sounddevice
+soundfile
+PyAudio
+vosk
+numpy
+
+fuzzywuzzy
+python-Levenshtein
+

@@ -1,0 +1,13 @@
+[Unit]
+Description=Smart alcobox
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/opt/smart_alcobox/assistant
+Environment="API_KEY=AQV..."
+ExecStart=/opt/venv/bin/python /opt/smart_alcobox/assistant/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
