@@ -1,15 +1,15 @@
+import os
+import time
+import json
+import queue
+import sounddevice as sd
+import vosk
+
 from speak import speak, play_wav
-from recognize import *
+from recognize import name_recognize, recognize_command
 from infinitetimer import InfiniteTimer
 from yagpt import send_prompt
 import glob_var
-
-import os
-import time
-import sounddevice as sd
-import vosk
-import json
-import queue
 
 model = vosk.Model("model_stt/vosk-model-small-ru-0.22")      # Модель нейросети
 samplerate = 44100                                            # Частота дискретизации микрофона
@@ -39,6 +39,30 @@ def f_spill():
     os.system('gpio write  6 0')
     play_wav('wav/notification.wav')
 
+def f_change_voice():
+    global default_voice
+    default_voice = 'alena' if default_voice == 'alexander' else 'alexander'
+    speak('Привет!', default_voice)
+
+def command_processing(key, heard):
+    commands = {
+        "help": lambda: print('f_help()'),
+        "about": f_about,
+        "volup": lambda: print('f_volup()'),
+        "voldown": lambda: print('f_voldown()'),
+        "volset": lambda: print('f_volset()'),
+        "tost": lambda: print('f_tost()'),
+        "spill": f_spill,
+        "shutdown": f_shutdown,
+        "change_voice": f_change_voice
+    }
+
+    if key in commands:
+        commands[key]()
+    else:
+        print('запрос в gpt')
+        f_gpt_speak(heard)
+
 def voice_listen():
     def exit_listen():
         glob_var.set_bool_wake_up(False)
@@ -49,44 +73,6 @@ def voice_listen():
         glob_var.set_bool_wake_up(False)
         t1.cancel()
         print("heard exit command")
-
-    def command_processing(key: str, heard: str):
-        command_off()
-        if key == "help":
-            # f_help()
-            print('f_help()')
-        elif key == "about":
-            print('f_about()')
-            f_about()
-        elif key == "volup":
-            # f_volup()
-            print('f_volup()')
-        elif key == "voldown":
-            # f_voldown()
-            print('f_voldown()')
-        elif key == "volset":
-            # f_volset()
-            print('f_volset()')
-        elif key == "tost":
-            # f_tost()
-            print('f_tost()')
-        elif key == "spill":
-            print('f_spill()')
-            f_spill()
-        elif key == "shutdown":
-            print('f_shutdown()')
-            f_shutdown()
-        elif key == "change_voice":
-            print('change_voice')
-            global default_voice
-            if default_voice == 'alexander':
-                default_voice = 'alena'
-            else:
-                default_voice = 'alexander'
-            speak('Привет!', default_voice)
-        else:
-            print('запрос в gpt')
-            f_gpt_speak(heard)
 
     f_about()
     t_shutdown = InfiniteTimer(1800, f_shutdown) # 30 минут в простое
@@ -111,6 +97,7 @@ def voice_listen():
                                 words = words[1:]
                                 heard = ' '.join(words)
                             command_processing(recognize_command(heard), heard)
+                            command_off()
                     t_shutdown.cancel()
                     t_shutdown.start()
                 else:
