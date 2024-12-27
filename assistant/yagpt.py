@@ -4,14 +4,14 @@ import json
 
 API_KEY = os.environ.get('API_KEY', '')
 CATALOG = "b1g3v2u3uhn4v5pt4avc" #идентификатор_каталога
-GPT_MODEL = "yandexgpt/latest"
+GPT_MODEL = "yandexgpt/rc"
 
 def send_prompt(system_text: str, user_text: str):
     prompt = {
         "modelUri": f"gpt://{CATALOG}/{GPT_MODEL}",
         "completionOptions": {
             "stream": False,
-            "temperature": 0.4,
+            "temperature": 0.5,
             "maxTokens": "1000"
         },
         "messages": [
