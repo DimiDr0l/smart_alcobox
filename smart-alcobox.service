@@ -6,7 +6,7 @@ After=network.target
 User=root
 WorkingDirectory=/opt/smart_alcobox/assistant
 Environment="API_KEY=AQV..."
-ExecStart=/opt/venv/bin/python /opt/smart_alcobox/assistant/main.py
+ExecStart=/opt/venv/bin/python main.py
 Restart=always
 
 [Install]
